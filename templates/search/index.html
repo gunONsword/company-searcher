@@ -1,0 +1,82 @@
+{% extends 'search/base.html' %}
+
+{% block title %}搜索日本公司 - Company Searcher{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="search-box text-center">
+            <h1 class="mb-4">
+                <i class="bi bi-search"></i> 日本公司搜索
+            </h1>
+            <p class="text-muted mb-4">
+                输入公司名称，搜索公司信息、招聘岗位和AI相关职位
+            </p>
+            
+            <form method="post" action="{% url 'search:search' %}">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" 
+                               name="company_name" 
+                               class="form-control form-control-lg" 
+                               placeholder="例如：Preferred Networks, Mercari, Rakuten"
+                               required>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="language" class="form-select form-select-lg">
+                            <option value="zh">中文</option>
+                            <option value="ja">日本語</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-search mt-4">
+                    <i class="bi bi-search"></i> 搜索
+                </button>
+            </form>
+
+            <div class="mt-5">
+                <h5 class="text-muted mb-3">支持的日本公司</h5>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <span class="badge bg-light text-dark p-2">Preferred Networks</span>
+                    <span class="badge bg-light text-dark p-2">Mercari</span>
+                    <span class="badge bg-light text-dark p-2">Rakuten</span>
+                    <span class="badge bg-light text-dark p-2">CyberAgent</span>
+                    <span class="badge bg-light text-dark p-2">LINE</span>
+                    <span class="badge bg-light text-dark p-2">Google Japan</span>
+                    <span class="badge bg-light text-dark p-2">Amazon Japan</span>
+                    <span class="badge bg-light text-dark p-2">Microsoft Japan</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <h5 class="text-muted">功能特点</h5>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="card h-100 p-3">
+                        <i class="bi bi-building fs-1 text-primary"></i>
+                        <h6 class="mt-2">公司信息</h6>
+                        <small class="text-muted">公司简介、成立时间、资本金、员工数</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 p-3">
+                        <i class="bi bi-briefcase fs-1 text-success"></i>
+                        <h6 class="mt-2">招聘岗位</h6>
+                        <small class="text-muted">工资、福利、remote、 技术栈</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 p-3">
+                        <i class="bi bi-robot fs-1 text-danger"></i>
+                        <h6 class="mt-2">AI岗位分析</h6>
+                        <small class="text-muted">识别LLM、ML、DL等AI相关职位</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

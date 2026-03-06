@@ -1,0 +1,242 @@
+{% extends 'search/base.html' %}
+
+{% block title %}{{ result.company_info.name }} - 公司报告{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <a href="/" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> 返回搜索
+        </a>
+    </div>
+</div>
+
+<!-- Company Info Card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="mb-1">{{ result.company_info.name }}</h2>
+                <p class="text-muted mb-2">
+                    {% if result.company_info.domain %}
+                        <i class="bi bi-globe"></i> {{ result.company_info.domain }}
+                    {% endif %}
+                </p>
+                {% if result.company_info.business %}
+                    <p class="mb-0">{{ result.company_info.business }}</p>
+                {% endif %}
+            </div>
+            <div class="col-md-4 text-md-end">
+                <span class="ai-badge">
+                    <i class="bi bi-robot"></i> AI Score: {{ result.analysis.ai_score }}
+                </span>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-3">
+                <small class="text-muted">成立时间</small>
+                <p class="mb-0 fw-bold">
+                    {% if result.company_info.founded %}{{ result.company_info.founded }}年{% else %}--{% endif %}
+                </p>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">资本金</small>
+                <p class="mb-0 fw-bold">{% if result.company_info.capital %}{{ result.company_info.capital }}{% else %}--{% endif %}</p>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">员工数</small>
+                <p class="mb-0 fw-bold">{% if result.company_info.employees %}{{ result.company_info.employees }}{% else %}--{% endif %}</p>
+            </div>
+            <div class="col-md-3">
+                <small class="text-muted">总部</small>
+                <p class="mb-0 fw-bold">{% if result.company_info.headquarter %}{{ result.company_info.headquarter }}{% else %}--{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ result.analysis.total_jobs }}</div>
+            <div class="stat-label">总岗位数</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number" style="color: #f5576c;">{{ result.analysis.ai_jobs }}</div>
+            <div class="stat-label">AI岗位数</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">
+                {% if result.analysis.salary_stats.avg %}{{ result.analysis.salary_stats.avg|div:10000 }}万{% else %}--{% endif %}
+            </div>
+            <div class="stat-label">平均薪资</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ result.analysis.ai_tech_stack|length }}</div>
+            <div class="stat-label">AI技术栈</div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Job Types -->
+{% if result.analysis.ai_job_types_localized %}
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-robot text-danger"></i> AI岗位类型分布</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for job_type, count in result.analysis.ai_job_types_localized.items %}
+            <div class="col-md-4 mb-2">
+                <span class="badge bg-primary me-2">{{ job_type }}</span>
+                <span class="fw-bold">{{ count }}</span> 个职位
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- AI Tech Stack -->
+{% if result.analysis.ai_tech_stack %}
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-code-slash text-info"></i> AI技术栈</h5>
+    </div>
+    <div class="card-body">
+        {% for tech in result.analysis.ai_tech_stack %}
+            <span class="tech-tag">{{ tech }}</span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- AI Jobs -->
+{% if result.ai_jobs %}
+<div class="card mb-4 border-danger">
+    <div class="card-header bg-white border-danger">
+        <h5 class="mb-0 text-danger">
+            <i class="bi bi-star"></i> AI相关岗位 ({{ result.ai_jobs|length }})
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>职位</th>
+                        <th>AI类型</th>
+                        <th>薪资</th>
+                        <th>Remote</th>
+                        <th>技术栈</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ai_job in result.ai_jobs %}
+                    <tr>
+                        <td>
+                            <a href="{{ ai_job.job.source_url }}" target="_blank" class="text-decoration-none fw-bold">
+                                {{ ai_job.job.title }}
+                            </a>
+                        </td>
+                        <td><span class="ai-badge">{{ ai_job.ai_type }}</span></td>
+                        <td class="salary">{% if ai_job.job.salary %}{{ ai_job.job.salary }}{% else %}--{% endif %}</td>
+                        <td>
+                            {% if ai_job.job.remote == 'full_remote' %}
+                                <span class="remote-badge remote-full"><i class="bi bi-house"></i> 完全远程</span>
+                            {% elif ai_job.job.remote == 'hybrid' %}
+                                <span class="remote-badge remote-hybrid"><i class="bi bi-building"></i> 混合</span>
+                            {% else %}
+                                <span class="remote-badge remote-onsite"><i class="bi bi-geo-alt"></i> 现场</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for tech in ai_job.job.tech_stack|slice:":5" %}
+                                <span class="tech-tag">{{ tech }}</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- All Jobs -->
+{% if result.jobs %}
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0"><i class="bi bi-briefcase"></i> 所有招聘岗位 ({{ result.jobs|length }})</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>职位</th>
+                        <th>类型</th>
+                        <th>薪资</th>
+                        <th>假期</th>
+                        <th>Remote</th>
+                        <th>技术栈</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in result.jobs %}
+                    <tr>
+                        <td>
+                            <a href="{{ job.source_url }}" target="_blank" class="text-decoration-none">
+                                {{ job.title }}
+                            </a>
+                            {% if job.is_ai_related %}
+                                <span class="ai-badge ms-1">AI</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ job.get_job_type_display }}</td>
+                        <td class="salary">{% if job.salary %}{{ job.salary }}{% else %}--{% endif %}</td>
+                        <td>{% if job.vacation_days %}{{ job.vacation_days }}{% else %}--{% endif %}</td>
+                        <td>
+                            {% if job.remote == 'full_remote' %}
+                                <span class="remote-badge remote-full">远程</span>
+                            {% elif job.remote == 'hybrid' %}
+                                <span class="remote-badge remote-hybrid">混合</span>
+                            {% else %}
+                                <span class="remote-badge remote-onsite">现场</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for tech in job.tech_stack|slice:":4" %}
+                                <span class="tech-tag">{{ tech }}</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Language Toggle -->
+<div class="text-center mt-4">
+    <small class="text-muted">
+        查看其他语言: 
+        <a href="?language=zh">中文</a> | 
+        <a href="?language=ja">日本語</a> | 
+        <a href="?language=en">English</a>
+    </small>
+</div>
+{% endblock %}

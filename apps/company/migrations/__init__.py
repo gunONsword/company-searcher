@@ -1,0 +1,3 @@
+"""
+Migrations for company app
+"""
